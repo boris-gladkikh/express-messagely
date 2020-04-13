@@ -7,9 +7,6 @@ const ExpressError = require("../expressError.js")
 
 
 
-
-
-
 // ** POST /login - login: {username, password} => {token}
 //  *
 //  * Make sure to update their last-login!
@@ -17,18 +14,20 @@ const ExpressError = require("../expressError.js")
 //  **/
 
 route.post("/login", async function (req, res, next) {
-  let { username, password } = req.body;
-  if (await User.authenticate(username, password) === true) {
-    let payload = { username };
-    let token = jwt.sign(payload, SECRET_KEY);
-    await User.updateLoginTimestamp(username);
+  try {
+    let { username, password } = req.body;
+    if (await User.authenticate(username, password) === true) {
+      let payload = { username };
+      let token = jwt.sign(payload, SECRET_KEY);
+      await User.updateLoginTimestamp(username);
 
-    return res.json({ token });
-  } else {
-    let err = new ExpressError("invalid username/password", 400)
+      return res.json({ token });
+    } else {
+      throw new ExpressError("invalid username/password", 400)
+    }
+  } catch (err) {
     return next(err);
   }
-
 })
 
 
@@ -43,7 +42,7 @@ route.post("/login", async function (req, res, next) {
 route.post("/register", async function (req, res, next) {
   try {
     let { username, password, first_name, last_name, phone } = req.body;
-    User.register({ username, password, first_name, last_name, phone });
+    await User.register({ username, password, first_name, last_name, phone });
     let payload = { username };
     let token = jwt.sign(payload, SECRET_KEY);
     await User.updateLoginTimestamp(username);
@@ -53,4 +52,6 @@ route.post("/register", async function (req, res, next) {
   }
 
 })
+
+module.exports = route;
 

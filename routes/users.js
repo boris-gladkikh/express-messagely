@@ -1,7 +1,7 @@
 const express = require('express');
 const route = new express.Router();
 const User = require("../models/user.js");
-const ExpressError = require("../expressError.js");
+const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
 
 /** GET / - get list of users.
  *
@@ -9,12 +9,14 @@ const ExpressError = require("../expressError.js");
  *
  **/
 
-route.get("/", async function (req, res, next) {
-  let results = await User.all();
+route.get("/", 
+  ensureLoggedIn,
+  async function (req, res, next) {
+    let results = await User.all();
 
-  return res.json({ users: results })
-
-})
+    return res.json({ users: results })
+  }
+);
 
 /** GET /:username - get detail of users.
  *
@@ -22,17 +24,19 @@ route.get("/", async function (req, res, next) {
  *
  **/
 
-route.get("/:username", async function (req, res, next) {
-  try {
-    let username = req.params.username;
-    let result = await User.get(username);
-    return res.json({ user: result });
+route.get("/:username", 
+  ensureCorrectUser,
+  async function (req, res, next) {
+    try {
+      let username = req.params.username;
+      let result = await User.get(username);
+      return res.json({ user: result });
 
-  } catch (err) {
-    return next(err);
+    } catch (err) {
+      return next(err);
+    }
   }
-
-})
+)
 
 
 /** GET /:username/to - get messages to user
@@ -45,16 +49,19 @@ route.get("/:username", async function (req, res, next) {
  *
  **/
 
-route.get("/:username/to", async function (req, res, next) {
-  try {
-    let username = req.params.username;
-    let results = await User.messagesTo(username);
-    return res.json({messages:results})
+route.get("/:username/to", 
+  ensureCorrectUser,
+  async function (req, res, next) {
+    try {
+      let username = req.params.username;
+      let results = await User.messagesTo(username);
+      return res.json({messages:results})
+    }
+    catch (err) {
+      return next(err);
+    }
   }
-  catch (err) {
-    return next(err);
-  }
-})
+);
 
 /** GET /:username/from - get messages from user
  *
@@ -66,14 +73,19 @@ route.get("/:username/to", async function (req, res, next) {
  *
  **/
 
-route.get("/:username/from", async function(req, res, next) {
-  try {
-    let username = req.params.username;
-    let results = await User.messagesTo(username);
-    return res.json({messages:results})
-  }
-  catch (err) {
-    return next(err);
-  }
+route.get("/:username/from", 
+  ensureCorrectUser,
+  async function(req, res, next) {
+    try {
+      let username = req.params.username;
+      let results = await User.messagesFrom(username);
+      return res.json({messages:results})
+    }
+    catch (err) {
+      return next(err);
+    }
 
-})
+  }
+)
+
+module.exports = route;

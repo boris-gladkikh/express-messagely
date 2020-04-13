@@ -42,6 +42,11 @@ class User {
       WHERE username = $1`,
       [username]
     )
+
+    if (savedPassword.rows.length === 0) {
+      throw new ExpressError(`Cannot find ${username}`, 400);
+    }
+
     let authenticated = await bcrypt.compare(password, savedPassword.rows[0].password)
 
     return authenticated;
