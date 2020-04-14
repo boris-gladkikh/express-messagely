@@ -4,6 +4,7 @@
 const express = require("express");
 const cors = require("cors");
 const { authenticateJWT } = require("./middleware/auth");
+const nunjucks = require("nunjucks");
 
 const ExpressError = require("./expressError")
 const app = express();
@@ -11,6 +12,12 @@ const app = express();
 // allow both form-encoded and json body parsing
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(express.static('static'));
+
+nunjucks.configure("templates", {
+  autoescape: true,
+  express: app
+});
 
 // allow connections to all routes from any browser
 app.use(cors());
@@ -23,10 +30,12 @@ app.use(authenticateJWT);
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const messageRoutes = require("./routes/messages");
+const clientRoutes = require("./routes/client");
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
+app.use("/", clientRoutes);
 
 /** 404 handler */
 

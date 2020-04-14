@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+  Sign Up/Log In
+{% endblock %}
+
+
+{% block content %}
+
+  <form id="signup-form">
+    <h3>Sign Up</h3>
+    <p class="form-group">
+      <label>
+        Username
+        <input type="text" class="form-control" id="username">
+      </label>
+    </p>
+
+    <p class="form-group">
+      <label>
+        Password
+        <input type="password" class="form-control" id="password">
+      </label>
+    </p>
+
+    <p class="form-group">
+      <label>
+        First Name
+        <input type="text" class="form-control" id="firstname">
+      </label>
+    </p>
+
+    <p class="form-group">
+      <label>
+        Last Name
+        <input type="text" class="form-control" id="lastname">
+      </label>
+    </p>
+
+    <p class="form-group">
+      <label>
+        Phone 
+        <input type="text" class="form-control" id="phone">
+      </label>
+    </p>
+
+    <button class="btn btn-primary" id="signup-button">Submit</button>
+  </form>
+{% endblock %}
